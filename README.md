@@ -23,7 +23,7 @@ Make sure you have all the required libraries installed. You can do this by runn
 Copy and paste the provided code into a Python file (image_analysis.py).
 
   Run the Python file using the command:
-<code>python app.py</code>
+<code>python image_analysis.py</code>
 
 Access the application on your browser at the specified address (e.g., http://127.0.0.1:8050/).
 
