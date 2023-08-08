@@ -1,3 +1,6 @@
+from __future__ import print_function
+import cv2 as cv
+import argparse
 import os
 import io
 import base64
@@ -7,10 +10,10 @@ from dash import dcc,html, dash_table
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
+import plotly.express as px
 import imageio.v2 as imageio
 import imagehash
 import numpy as np
-import cv2
 from PIL import Image
 from PIL.ExifTags import TAGS
 
@@ -191,6 +194,8 @@ upload_layout = html.Div([
     
 ])
 
+
+
 # Layout for the Tab content
 tab_content_layout = html.Div(
     [
@@ -293,6 +298,14 @@ tab_content_layout = html.Div(
                         html.Div(id="tab8-content"),
                     ],
                 ),
+                dcc.Tab(
+                    label="Orb Detection Plot",
+                    value="tab-9",
+                    children=[
+                        html.Div(id="tab9-content"),
+                        dcc.Graph(id='feature-plot'),
+                    ]
+                )
             ],
         )
     ]
@@ -595,7 +608,46 @@ def update_jpeg_string_analysis(n_clicks, contents, file_path):
                 style_table={'overflowX': 'auto'},
             ),
         ])
+    
+def orb_detection_function(image_path):
+    
+    parser = argparse.ArgumentParser(description='Code for Feature Detection tutorial.')
+    parser.add_argument('--input', help='Path to input image.', default=image_path)
+    args = parser.parse_args()
+    # Load the image for SURF keypoint detection
+    src = cv.imread(cv.samples.findFile(image_path), cv.IMREAD_GRAYSCALE)
+    if src is not None:
+        # Detect ORB keypoints
+        orb = cv.ORB_create()
+        keypoints, descriptors = orb.detectAndCompute(src, None)
+        
+        # Draw keypoints
+        img_keypoints = cv.drawKeypoints(src, keypoints, None, color=(0, 255, 0), flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        
+        # Convert to PIL Image for Dash display
+        orb_img = Image.fromarray(img_keypoints)
+        orb_fig = px.imshow(np.array(orb_img))
+        orb_fig.update_layout(margin=dict(l=10, r=10, t=0, b=0))
+    else:
+        print ("Could not load the image")
 
+    return orb_fig
+
+@app.callback(
+    [Output('tab9-content', 'children'),
+     Output('feature-plot', 'figure')],
+    [Input('submit-button', 'n_clicks')],
+    [State('upload-image', 'contents'),
+     State('image-path-input', 'value')]
+)
+def update_orb_detection_plot(n_clicks, uploaded_contents, image_path):
+    if image_path is not None:
+        orb_detection_plot = orb_detection_function(image_path)
+        return html.Div([
+            dcc.Graph(figure=orb_detection_plot),
+        ]), orb_detection_plot
+    else:
+        return html.P(['Please upload an image or provide the file path for the analysis.']), dash.no_update
 
 
 if __name__ == '__main__':
