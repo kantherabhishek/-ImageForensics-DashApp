@@ -1,7 +1,7 @@
 # ImageForensics-DashApp
 This Python Dash application allows you to perform various image forensic analyses using different image processing functions. It utilizes histogram equalization, luminance gradient calculation, error level analysis, and perceptual hash for clone detection. The application also uses external libraries such as OpenCV, imageio, and dash to deliver an interactive and user-friendly experience.
 
-[![Click to view the video](image.jpg)](https://youtu.be/8AmAy0vozSY)
+[![Click to view the video](/image.jpg)](https://youtu.be/8AmAy0vozSY)
 
 # How to Use the Application?
 1. Upload an Image: Drag and drop or click to select an image for analysis.
